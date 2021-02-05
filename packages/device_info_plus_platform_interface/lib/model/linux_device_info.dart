@@ -10,17 +10,17 @@
 class LinuxDeviceInfo {
   /// Constructs a LinuxDeviceInfo.
   LinuxDeviceInfo({
-    this.name,
-    this.version,
-    this.id,
-    this.idLike,
-    this.versionCodename,
-    this.versionId,
-    this.prettyName,
-    this.buildId,
-    this.variant,
-    this.variantId,
-    this.machineId,
+    required this.name,
+    required this.version,
+    required this.id,
+    required this.idLike,
+    required this.versionCodename,
+    required this.versionId,
+    required this.prettyName,
+    required this.buildId,
+    required this.variant,
+    required this.variantId,
+    required this.machineId,
   });
 
   /// A string identifying the operating system, without a version component,

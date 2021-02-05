@@ -7,11 +7,11 @@ import 'package:meta/meta.dart';
 
 /// See [DeviceInfoPlatform]
 class DeviceInfoLinux extends DeviceInfoPlatform {
-  LinuxDeviceInfo _cache;
+  LinuxDeviceInfo? _cache;
   final FileSystem _fileSystem;
 
   ///
-  DeviceInfoLinux({@visibleForTesting FileSystem fileSystem})
+  DeviceInfoLinux({@visibleForTesting FileSystem? fileSystem})
       : _fileSystem = fileSystem ?? LocalFileSystem();
 
   @override
@@ -26,25 +26,25 @@ class DeviceInfoLinux extends DeviceInfoPlatform {
 
     return LinuxDeviceInfo(
       name: os['NAME'] ?? 'Linux',
-      version: os['VERSION'] ?? lsb['LSB_VERSION'],
+      version: os['VERSION'] ?? lsb['LSB_VERSION'] ?? '',
       id: os['ID'] ?? lsb['DISTRIB_ID'] ?? 'linux',
-      idLike: os['ID_LIKE']?.split(' '),
-      versionCodename: os['VERSION_CODENAME'] ?? lsb['DISTRIB_CODENAME'],
-      versionId: os['VERSION_ID'] ?? lsb['DISTRIB_RELEASE'],
+      idLike: os['ID_LIKE']?.split(' ') ?? [],
+      versionCodename: os['VERSION_CODENAME'] ?? lsb['DISTRIB_CODENAME'] ?? '',
+      versionId: os['VERSION_ID'] ?? lsb['DISTRIB_RELEASE'] ?? '',
       prettyName: os['PRETTY_NAME'] ?? lsb['DISTRIB_DESCRIPTION'] ?? 'Linux',
-      buildId: os['BUILD_ID'],
-      variant: os['VARIANT'],
-      variantId: os['VARIANT_ID'],
+      buildId: os['BUILD_ID'] ?? '',
+      variant: os['VARIANT'] ?? '',
+      variantId: os['VARIANT_ID'] ?? '',
       machineId: machineId,
     );
   }
 
-  Future<Map<String, String>> _getOsRelease() {
-    return _tryReadKeyValues('/etc/os-release')
-        .then((value) => value ?? _tryReadKeyValues('/usr/lib/os-release'));
+  Future<Map<String, String?>?> _getOsRelease() {
+    return _tryReadKeyValues('/etc/os-release').then((value) async =>
+        value ?? await _tryReadKeyValues('/usr/lib/os-release'));
   }
 
-  Future<Map<String, String>> _getLsbRelease() {
+  Future<Map<String, String?>?> _getLsbRelease() {
     return _tryReadKeyValues('/etc/lsb-release');
   }
 
@@ -60,7 +60,7 @@ class DeviceInfoLinux extends DeviceInfoPlatform {
         .catchError((_) => null);
   }
 
-  Future<Map<String, String>> _tryReadKeyValues(String path) {
+  Future<Map<String, String?>?> _tryReadKeyValues(String path) {
     return _fileSystem
         .file(path)
         .readAsLines()
@@ -86,7 +86,7 @@ extension _Unquote on String {
 }
 
 extension _KeyValues on List<String> {
-  Map<String, String> toKeyValues() {
+  Map<String, String?> toKeyValues() {
     return Map.fromEntries(map((line) {
       final parts = line.split('=');
       if (parts.length != 2) return MapEntry(line, null);
